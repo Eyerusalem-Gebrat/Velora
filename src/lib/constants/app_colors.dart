@@ -11,6 +11,7 @@ class AppColors {
   static const Color iconButtonBg = Color(0xFFF2F2F2);
   static const Color toggleInactiveBg = Color(0xFFE8E8E8);
   static const Color bannerBg = Color(0xFFF6D9CE);
+  static const Color navBarBackground = Color(0xFF6B6B6B);
   
   // Text colors
   static const Color textPrimary = Color(0xFF1A1A1A);

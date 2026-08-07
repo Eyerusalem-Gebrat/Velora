@@ -63,7 +63,8 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/onboarding_bg.jpg
+    - assets/images/image.png
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

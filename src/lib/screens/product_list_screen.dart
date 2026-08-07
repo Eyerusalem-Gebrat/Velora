@@ -4,6 +4,7 @@ import '../constants/app_colors.dart';
 import '../models/product.dart';
 import '../providers/product_provider.dart';
 import '../providers/cart_provider.dart';
+import '../utils/format_helpers.dart';
 import '../widgets/app_search_bar.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../widgets/app_top_icon_button.dart';
@@ -76,18 +77,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
   }
 
-  String _formatCategoryTitle(String? selectedCategory) {
-    if (selectedCategory == null ||
-        selectedCategory.isEmpty ||
-        selectedCategory == 'All') {
-      return 'All Products';
-    }
-    final words = selectedCategory.split(' ');
-    return words.map((word) {
-      if (word.isEmpty) return word;
-      return '${word[0].toUpperCase()}${word.substring(1)}';
-    }).join(' ');
-  }
+  // Returns 'All Products' for null/empty/'All', otherwise title-cases the category string.
+  String _screenTitle(String? cat) =>
+      (cat == null || cat.isEmpty || cat == 'All') ? 'All Products' : formatCategory(cat);
 
   Widget _buildProductGrid(ProductProvider productProvider) {
     if (productProvider.isLoading && productProvider.allProducts.isEmpty) {
@@ -114,9 +106,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth >= 600;
-    final crossAxisCount = isTablet ? 3 : 2;
-    final childAspectRatio = isTablet ? 0.76 : 0.72;
+    int crossAxisCount = 2;
+    if (screenWidth >= 1200) {
+      crossAxisCount = 5;
+    } else if (screenWidth >= 900) {
+      crossAxisCount = 4;
+    } else if (screenWidth >= 600) {
+      crossAxisCount = 3;
+    }
+    final childAspectRatio = screenWidth >= 600 ? 0.76 : 0.72;
 
     return GridView.builder(
       padding: const EdgeInsets.only(
@@ -145,7 +143,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     final productProvider = context.watch<ProductProvider>();
     final selectedCategory = productProvider.selectedCategory;
-    final titleText = _formatCategoryTitle(selectedCategory);
+    final titleText = _screenTitle(selectedCategory);
     final filterPills = ['All', ...productProvider.categories];
 
     return Scaffold(
@@ -153,117 +151,111 @@ class _ProductListScreenState extends State<ProductListScreen> {
       body: Stack(
         children: [
           SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    // 1. Top row: back button, category title, bag icon
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          AppTopIconButton(
-                            icon: Icons.arrow_back_rounded,
-                            onTap: () {
-                              if (Navigator.canPop(context)) {
-                                Navigator.pop(context);
-                              } else {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const HomeScreen()),
-                                );
-                              }
-                            },
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              titleText,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                          AppTopIconButton(
-                            icon: Icons.shopping_bag_outlined,
-                            badgeCount: context.watch<CartProvider>().itemCount,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const CartScreen()),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // 2. Search bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: AppSearchBar(
-                        controller: _searchController,
-                        onChanged: (value) {
-                          context.read<ProductProvider>().setSearchQuery(value);
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                // 1. Top row: back button, category title, bag icon
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      AppTopIconButton(
+                        icon: Icons.arrow_back_rounded,
+                        onTap: () {
+                          if (Navigator.canPop(context)) {
+                            Navigator.pop(context);
+                          } else {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const HomeScreen()),
+                            );
+                          }
                         },
-                        onFilterTap: () {},
                       ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // 3. Filter pills row
-                    SizedBox(
-                      height: 40,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: filterPills.length,
-                        itemBuilder: (context, index) {
-                          final cat = filterPills[index];
-                          final isSelected = (cat == 'All')
-                              ? (selectedCategory == null || selectedCategory == 'All')
-                              : (selectedCategory == cat);
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: FilterPill(
-                              label: _formatCategoryTitle(cat),
-                              isSelected: isSelected,
-                              onTap: () {
-                                if (cat == 'All') {
-                                  context
-                                      .read<ProductProvider>()
-                                      .setSelectedCategory(null);
-                                } else {
-                                  context
-                                      .read<ProductProvider>()
-                                      .setSelectedCategory(cat);
-                                }
-                              },
-                            ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          titleText,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      AppTopIconButton(
+                        icon: Icons.shopping_bag_outlined,
+                        badgeCount: context.watch<CartProvider>().itemCount,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const CartScreen()),
                           );
                         },
                       ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // 4. Scrollable GridView / State handling
-                    Expanded(
-                      child: _buildProductGrid(productProvider),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+
+                const SizedBox(height: 16),
+
+                // 2. Search bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: AppSearchBar(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      context.read<ProductProvider>().setSearchQuery(value);
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 3. Filter pills row
+                SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filterPills.length,
+                    itemBuilder: (context, index) {
+                      final cat = filterPills[index];
+                      final isSelected = (cat == 'All')
+                          ? (selectedCategory == null || selectedCategory == 'All')
+                          : (selectedCategory == cat);
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: FilterPill(
+                          label: _screenTitle(cat),
+                          isSelected: isSelected,
+                          onTap: () {
+                            if (cat == 'All') {
+                              context
+                                  .read<ProductProvider>()
+                                  .setSelectedCategory(null);
+                            } else {
+                              context
+                                  .read<ProductProvider>()
+                                  .setSelectedCategory(cat);
+                            }
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 4. Scrollable GridView / State handling
+                Expanded(
+                  child: _buildProductGrid(productProvider),
+                ),
+              ],
             ),
           ),
 

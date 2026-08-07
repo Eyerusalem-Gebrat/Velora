@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../providers/cart_provider.dart';
+import '../utils/format_helpers.dart';
 import '../widgets/app_top_icon_button.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../widgets/empty_state_widget.dart';
@@ -49,240 +50,213 @@ class CartScreen extends StatelessWidget {
       body: Stack(
         children: [
           SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    // Top Bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          AppTopIconButton(
-                            icon: Icons.arrow_back_rounded,
-                            onTap: () => _navigateToHome(context),
-                          ),
-                          const Text(
-                            'Cart',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          AppTopIconButton(
-                            icon: Icons.grid_view_rounded,
-                            onTap: () {},
-                          ),
-                        ],
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                // Top Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      AppTopIconButton(
+                        icon: Icons.arrow_back_rounded,
+                        onTap: () => _navigateToHome(context),
                       ),
-                    ),
+                      const Text(
+                        'Cart',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      AppTopIconButton(
+                        icon: Icons.grid_view_rounded,
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
+                ),
 
-                    const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                    // Main Content
-                    Expanded(
-                      child: isEmpty
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const EmptyStateWidget(
-                                  icon: Icons.shopping_bag_outlined,
-                                  message: 'Your cart is empty',
-                                ),
-                                const SizedBox(height: 12),
-                                ElevatedButton.icon(
-                                  onPressed: () => _navigateToHome(context),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryDark,
-                                    foregroundColor: Colors.white,
-                                    shape: const StadiumBorder(),
-                                  ),
-                                  icon: const Icon(Icons.shopping_bag_outlined,
-                                      size: 16),
-                                  label: const Text('Start Shopping'),
-                                ),
-                              ],
-                            )
-                          : ListView.builder(
-                              padding: const EdgeInsets.only(
-                                left: 20,
-                                right: 20,
-                                bottom: 160,
+                // Main Content
+                Expanded(
+                  child: isEmpty
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const EmptyStateWidget(
+                              icon: Icons.shopping_bag_outlined,
+                              message: 'Your cart is empty',
+                            ),
+                            const SizedBox(height: 12),
+                            ElevatedButton.icon(
+                              onPressed: () => _navigateToHome(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryDark,
+                                foregroundColor: Colors.white,
+                                shape: const StadiumBorder(),
                               ),
-                              itemCount: cartItems.length,
-                              itemBuilder: (context, index) {
-                                final item = cartItems[index];
-                                final productId = item.product.id;
-                                final isFirstItem = index == 0;
+                              icon: const Icon(Icons.shopping_bag_outlined,
+                                  size: 16),
+                              label: const Text('Start Shopping'),
+                            ),
+                          ],
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            bottom: 160,
+                          ),
+                          itemCount: cartItems.length,
+                          itemBuilder: (context, index) {
+                            final item = cartItems[index];
+                            final productId = item.product.id;
 
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 14),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.cardWhite,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: AppColors.shadow,
-                                        blurRadius: 10,
-                                        offset: Offset(0, 4),
-                                      ),
-                                    ],
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 14),
+                              decoration: BoxDecoration(
+                                color: AppColors.cardWhite,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: AppColors.shadow,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 4),
                                   ),
-                                  padding: const EdgeInsets.all(12),
-                                  child: Row(
-                                    children: [
-                                      // Product Thumbnail
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(12),
-                                        child: Image.network(
-                                          item.product.image,
-                                          width: 76,
-                                          height: 76,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                                  Container(
-                                            width: 76,
-                                            height: 76,
-                                            color: AppColors.iconButtonBg,
-                                            child: const Icon(
-                                              Icons.checkroom_outlined,
-                                              color: AppColors.textSecondary,
-                                            ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                children: [
+                                  // Product Thumbnail
+                                  ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(12),
+                                    child: Image.network(
+                                      item.product.image,
+                                      width: 76,
+                                      height: 76,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                        width: 76,
+                                        height: 76,
+                                        color: AppColors.iconButtonBg,
+                                        child: const Icon(
+                                          Icons.checkroom_outlined,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+
+                                  // Details Column
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.product.title,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textPrimary,
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 14),
-
-                                      // Details Column
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              item.product.title,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textPrimary,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Size: ${item.size}  •  Color: ${item.color}',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: AppColors.textSecondary,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              '\$${item.subtotal.toStringAsFixed(2)}',
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.price,
-                                              ),
-                                            ),
-                                          ],
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Size: ${item.size}  •  Color: ${item.color}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppColors.textSecondary,
+                                          ),
                                         ),
-                                      ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          formatPrice(item.subtotal),
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.price,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
 
-                                      const SizedBox(width: 8),
+                                  const SizedBox(width: 8),
 
-                                      // Action column: trash for first item, stepper for rest
-                                      if (isFirstItem)
+                                  // Consistent Quantity Stepper for every item row
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.iconButtonBg,
+                                      borderRadius:
+                                          BorderRadius.circular(20),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 4,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
                                         GestureDetector(
                                           onTap: () => context
                                               .read<CartProvider>()
-                                              .removeItem(productId),
-                                          child: Container(
-                                            width: 36,
-                                            height: 36,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.badgeRed
-                                                  .withOpacity(0.12),
-                                              shape: BoxShape.circle,
+                                              .decrementQuantity(
+                                                  productId),
+                                          child: const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 6),
+                                            child: Icon(
+                                              Icons.remove,
+                                              size: 14,
+                                              color: AppColors.textPrimary,
                                             ),
-                                            child: const Icon(
-                                              Icons.delete_outline_rounded,
-                                              color: AppColors.badgeRed,
-                                              size: 18,
-                                            ),
-                                          ),
-                                        )
-                                      else
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: AppColors.iconButtonBg,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 4,
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () => context
-                                                    .read<CartProvider>()
-                                                    .decrementQuantity(
-                                                        productId),
-                                                child: const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 6),
-                                                  child: Icon(
-                                                    Icons.remove,
-                                                    size: 14,
-                                                    color: AppColors.textPrimary,
-                                                  ),
-                                                ),
-                                              ),
-                                              Text(
-                                                '${item.quantity}',
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.textPrimary,
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () => context
-                                                    .read<CartProvider>()
-                                                    .incrementQuantity(
-                                                        productId),
-                                                child: const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 6),
-                                                  child: Icon(
-                                                    Icons.add,
-                                                    size: 14,
-                                                    color: AppColors.textPrimary,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
                                           ),
                                         ),
-                                    ],
+                                        Text(
+                                          '${item.quantity}',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textPrimary,
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () => context
+                                              .read<CartProvider>()
+                                              .incrementQuantity(
+                                                  productId),
+                                          child: const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 6),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 14,
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                 ),
-              ),
+              ],
             ),
           ),
 
@@ -329,7 +303,7 @@ class CartScreen extends StatelessWidget {
                               FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Text(
-                                  '\$${cartProvider.totalPrice.toStringAsFixed(2)}',
+                                  formatPrice(cartProvider.totalPrice),
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,

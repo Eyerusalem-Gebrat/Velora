@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../constants/app_colors.dart';
 import '../models/product.dart';
+import '../utils/format_helpers.dart';
 import 'status_badge.dart';
 
 class ProductCard extends StatelessWidget {
@@ -111,7 +112,7 @@ class ProductCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Text(
-                '\$${product.price.toStringAsFixed(2)}',
+                formatPrice(product.price),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(

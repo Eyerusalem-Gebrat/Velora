@@ -4,7 +4,6 @@ import '../constants/app_colors.dart';
 class AppSearchBar extends StatelessWidget {
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
-  final VoidCallback? onFilterTap;
   final VoidCallback? onTap;
   final String hintText;
 
@@ -12,7 +11,6 @@ class AppSearchBar extends StatelessWidget {
     super.key,
     this.controller,
     this.onChanged,
-    this.onFilterTap,
     this.onTap,
     this.hintText = 'Search for brands, styles...',
   });
@@ -61,25 +59,6 @@ class AppSearchBar extends StatelessWidget {
                 ),
               ),
             ),
-            if (onFilterTap != null) ...[
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: onFilterTap,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryDark,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.tune_rounded,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-              ),
-            ],
           ],
         ),
       ),

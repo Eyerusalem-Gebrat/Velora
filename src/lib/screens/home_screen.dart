@@ -4,7 +4,7 @@ import '../constants/app_colors.dart';
 import '../models/product.dart';
 import '../providers/product_provider.dart';
 import '../providers/cart_provider.dart';
-import '../widgets/app_search_bar.dart';
+import '../utils/format_helpers.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../widgets/app_top_icon_button.dart';
 import '../widgets/product_card.dart';
@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(
         builder: (_) => ProductListScreen(
-          categoryName: category != null ? _formatCategoryLabel(category) : 'All Products',
+          categoryName: category != null ? formatCategory(category) : 'All Products',
         ),
       ),
     );
@@ -81,22 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
       return Icons.devices_other_outlined;
     } else if (lower.contains('jewelery') || lower.contains('jewelry')) {
       return Icons.diamond_outlined;
-    } else if (lower.contains('men')) {
-      return Icons.male_outlined;
     } else if (lower.contains('women')) {
-      return Icons.female_outlined;
+      return Icons.female;
+    } else if (lower.contains('men')) {
+      return Icons.male;
     }
     return Icons.grid_view_outlined;
   }
 
-  String _formatCategoryLabel(String rawCategory) {
-    if (rawCategory.isEmpty) return rawCategory;
-    final words = rawCategory.split(' ');
-    return words.map((word) {
-      if (word.isEmpty) return word;
-      return '${word[0].toUpperCase()}${word.substring(1)}';
-    }).join(' ');
-  }
+
 
   Widget _buildBody(ProductProvider productProvider) {
     if (productProvider.isLoading && productProvider.allProducts.isEmpty) {
@@ -113,173 +106,126 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    final trendingProducts = productProvider.allProducts.take(6).toList();
+    final products = productProvider.allProducts;
     final selectedCat = productProvider.selectedCategory;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth >= 600;
-    final crossAxisCount = isTablet ? 3 : 2;
-    final childAspectRatio = isTablet ? 0.76 : 0.72;
 
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 800),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 110),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
+    int crossAxisCount = 2;
+    if (screenWidth >= 1200) {
+      crossAxisCount = 5;
+    } else if (screenWidth >= 900) {
+      crossAxisCount = 4;
+    } else if (screenWidth >= 600) {
+      crossAxisCount = 3;
+    }
 
-              // 1. Top row: "Velora" wordmark on left, bag button on right
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Velora',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -1.0,
-                        color: AppColors.textPrimary,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                    AppTopIconButton(
-                      icon: Icons.shopping_bag_outlined,
-                      badgeCount: context.watch<CartProvider>().itemCount,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const CartScreen()),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+    final childAspectRatio = screenWidth >= 600 ? 0.76 : 0.72;
 
-              const SizedBox(height: 16),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 110),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 12),
 
-              // 2. Search bar -> tapping navigates to search page
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: GestureDetector(
-                  onTap: () => _navigateToProductList(),
-                  child: const AbsorbPointer(
-                    child: AppSearchBar(),
+          // 1. Top row: "Velora" wordmark on left, bag button on right
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Velora',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -1.0,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'Poppins',
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // 3. Category section header & horizontal list from API categories
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Category',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => _navigateToProductList(),
-                      child: const Text(
-                        'See all',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 86,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: productProvider.categories.length,
-                  itemBuilder: (context, index) {
-                    final category = productProvider.categories[index];
-                    final isSelected = selectedCat == category;
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: CategoryIconItem(
-                        icon: _getCategoryIcon(category),
-                        label: _formatCategoryLabel(category),
-                        isSelected: isSelected,
-                        onTap: () => _navigateToProductList(category),
-                      ),
+                AppTopIconButton(
+                  icon: Icons.shopping_bag_outlined,
+                  badgeCount: context.watch<CartProvider>().itemCount,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CartScreen()),
                     );
                   },
                 ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // 4. Trending Now header & responsive GridView
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Trending Now',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => _navigateToProductList(),
-                      child: const Text(
-                        'See all',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: trendingProducts.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    childAspectRatio: childAspectRatio,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 14,
-                  ),
-                  itemBuilder: (context, index) {
-                    final product = trendingProducts[index];
-                    return ProductCard(
-                      product: product,
-                      onTap: () => _navigateToProductDetail(product),
-                    );
-                  },
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+
+          const SizedBox(height: 24),
+
+          // 2. Category section header (no "See all") & evenly spaced row
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              'Category',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: productProvider.categories.map((category) {
+                final isSelected = selectedCat == category;
+                return CategoryIconItem(
+                  icon: _getCategoryIcon(category),
+                  label: formatCategory(category),
+                  isSelected: isSelected,
+                  onTap: () => _navigateToProductList(category),
+                );
+              }).toList(),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // 3. Products header "All Products" (no "See all") & responsive GridView
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              'All Products',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: products.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                childAspectRatio: childAspectRatio,
+                crossAxisSpacing: 14,
+                mainAxisSpacing: 14,
+              ),
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return ProductCard(
+                  product: product,
+                  onTap: () => _navigateToProductDetail(product),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

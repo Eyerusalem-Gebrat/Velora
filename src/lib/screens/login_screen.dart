@@ -27,18 +27,25 @@ class LoginScreen extends StatelessWidget {
           Positioned.fill(
             child: SizedBox.expand(
               child: Image.asset(
-                'assets/images/onboarding_bg.jpg',
+                'assets/images/image.png',
                 fit: BoxFit.cover,
                 alignment: Alignment.center,
                 width: double.infinity,
                 height: double.infinity,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: const Color(0xFF111111),
-                  child: const Center(
-                    child: Icon(
-                      Icons.checkroom_outlined,
-                      size: 64,
-                      color: Colors.white24,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  'lib/images/image.png',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: const Color(0xFF111111),
+                    child: const Center(
+                      child: Icon(
+                        Icons.checkroom_outlined,
+                        size: 64,
+                        color: Colors.white24,
+                      ),
                     ),
                   ),
                 ),
@@ -46,23 +53,28 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
 
-          // Dark Bottom Panel (~35% height)
+          // Dark Gradient Scrim overlay for readable text at the bottom
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFF111111),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.5),
+                    Colors.black.withOpacity(0.85),
+                  ],
+                  stops: const [0.0, 0.35, 1.0],
                 ),
               ),
               padding: const EdgeInsets.only(
                 left: 24,
                 right: 24,
-                top: 28,
+                top: 48,
                 bottom: 36,
               ),
               child: Column(
@@ -102,7 +114,7 @@ class LoginScreen extends StatelessWidget {
                     'Discover fashion picks from every category, all in one place.',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Color(0xFFB8B6B0),
+                      color: Color(0xFFE0E0E0),
                       height: 1.4,
                     ),
                   ),
@@ -285,8 +297,8 @@ class _LoginBottomSheetState extends State<_LoginBottomSheet> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                       color: AppColors.textSecondary,
                       size: 20,
                     ),

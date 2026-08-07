@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../models/cart_item.dart';
 import '../providers/cart_provider.dart';
+import '../utils/format_helpers.dart';
 import '../widgets/app_top_icon_button.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -18,20 +19,10 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  int _itemQuantity = 1;
   int _selectedPaymentMethod = 0; // 0: Credit Card, 1: Mobile Money, 2: PayPal, 3: Cash on Delivery
 
-  final double _basePrice = 700.00;
-  final double _shippingFee = 10.00;
-  final double _discount = 50.00;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.cartItems != null && widget.cartItems!.isNotEmpty) {
-      _itemQuantity = widget.cartItems!.first.quantity;
-    }
-  }
+  static const double _shippingFee = 10.00;
+  static const double _discount = 50.00;
 
   double get _subtotal => context.read<CartProvider>().totalPrice;
   double get _total => (_subtotal + _shippingFee - _discount).clamp(0, 999999);
@@ -144,13 +135,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     final displayTitle = (widget.cartItems != null && widget.cartItems!.isNotEmpty)
         ? widget.cartItems!.first.title
-        : 'Oversized Knitted Dress';
+        : '';
     final displayImage = (widget.cartItems != null && widget.cartItems!.isNotEmpty)
         ? widget.cartItems!.first.imageUrl
-        : 'https://picsum.photos/seed/detail/400/600';
+        : '';
     final displayPrice = (widget.cartItems != null && widget.cartItems!.isNotEmpty)
         ? widget.cartItems!.first.price
-        : _basePrice;
+        : 0.0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -251,7 +242,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    '\$${displayPrice.toStringAsFixed(2)}',
+                                    formatPrice(displayPrice),
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -262,56 +253,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            // Quantity Stepper
+                            // Read-only quantity display
                             Container(
                               decoration: BoxDecoration(
                                 color: AppColors.iconButtonBg,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 4,
+                                horizontal: 16,
+                                vertical: 8,
                               ),
-                              child: Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (_itemQuantity > 1) {
-                                        setState(() => _itemQuantity--);
-                                      }
-                                    },
-                                    child: const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 6),
-                                      child: Icon(
-                                        Icons.remove,
-                                        size: 14,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    '$_itemQuantity',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () =>
-                                        setState(() => _itemQuantity++),
-                                    child: const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 6),
-                                      child: Icon(
-                                        Icons.add,
-                                        size: 14,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                'Qty: ${(widget.cartItems != null && widget.cartItems!.isNotEmpty) ? widget.cartItems!.first.quantity : 1}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
                           ],
@@ -483,7 +441,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '\$${_subtotal.toStringAsFixed(2)}',
+                                  formatPrice(_subtotal),
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
@@ -504,7 +462,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '\$${_shippingFee.toStringAsFixed(2)}',
+                                  formatPrice(_shippingFee),
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
@@ -525,7 +483,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '-\$${_discount.toStringAsFixed(2)}',
+                                  '-${formatPrice(_discount)}',
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
@@ -551,7 +509,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '\$${_total.toStringAsFixed(2)}',
+                                  formatPrice(_total),
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -609,7 +567,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         Row(
                           children: [
                             Text(
-                              '\$${_total.toStringAsFixed(2)}',
+                              formatPrice(_total),
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

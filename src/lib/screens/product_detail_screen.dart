@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
+import '../utils/format_helpers.dart';
 import '../widgets/app_top_icon_button.dart';
 import '../widgets/size_selector_pill.dart';
 import 'cart_screen.dart';
@@ -25,20 +26,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   final List<String> _sizes = const ['XS', 'S', 'M', 'L', 'XL'];
 
-  String _formatCategory(String category) {
-    if (category.isEmpty) return category;
-    final words = category.split(' ');
-    return words.map((word) {
-      if (word.isEmpty) return word;
-      return '${word[0].toUpperCase()}${word.substring(1)}';
-    }).join(' ');
-  }
-
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final imageHeight = mediaQuery.size.height * 0.48;
-    final formattedCategory = _formatCategory(widget.product.category);
+    final formattedCategory = formatCategory(widget.product.category);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -96,38 +88,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         top: mediaQuery.padding.top + 8,
                         left: 20,
                         right: 20,
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 600),
-                            child: Row(
-                              children: [
-                                AppTopIconButton(
-                                  icon: Icons.arrow_back_rounded,
-                                  onTap: () => Navigator.pop(context),
-                                ),
-                                const SizedBox(width: 12),
-                                const Text(
-                                  'Product Details',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                const Spacer(),
-                                AppTopIconButton(
-                                  icon: Icons.shopping_bag_outlined,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) => const CartScreen()),
-                                    );
-                                  },
-                                ),
-                              ],
+                        child: Row(
+                          children: [
+                            AppTopIconButton(
+                              icon: Icons.arrow_back_rounded,
+                              onTap: () => Navigator.pop(context),
                             ),
-                          ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Product Details',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const Spacer(),
+                            AppTopIconButton(
+                              icon: Icons.shopping_bag_outlined,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const CartScreen()),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
 
@@ -173,11 +160,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 // Details Card overlapping image slightly
                 Transform.translate(
                   offset: const Offset(0, -20),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 600),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Container(
                           decoration: BoxDecoration(
                             color: AppColors.cardWhite,
@@ -251,7 +235,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   ),
                                   const SizedBox(width: 12),
                                   Text(
-                                    '\$${widget.product.price.toStringAsFixed(2)}',
+                                    formatPrice(widget.product.price),
                                     style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -334,8 +318,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ),
                     ),
-                  ),
-                ),
               ],
             ),
           ),
