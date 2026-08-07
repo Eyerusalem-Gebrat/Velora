@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'constants/app_theme.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const VeloraApp());
@@ -12,16 +14,8 @@ class VeloraApp extends StatelessWidget {
     return MaterialApp(
       title: 'Velora',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Velora App'),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      home: const HomeScreen(),
     );
   }
 }
-
