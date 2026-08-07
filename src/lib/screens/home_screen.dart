@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../models/product.dart';
 import '../providers/product_provider.dart';
+import '../providers/cart_provider.dart';
 import '../widgets/app_search_bar.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../widgets/app_top_icon_button.dart';
@@ -140,8 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 AppTopIconButton(
                   icon: Icons.shopping_bag_outlined,
-                  // TODO: wire to CartProvider.itemCount in the cart commit
-                  badgeCount: 0,
+                  badgeCount: context.watch<CartProvider>().itemCount,
                   onTap: () {
                     Navigator.push(
                       context,

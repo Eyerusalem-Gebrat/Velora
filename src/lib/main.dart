@@ -7,21 +7,40 @@ import 'providers/cart_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const VeloraApp());
+
+  // Load persistent data before the first frame renders.
+  final authProvider = AuthProvider();
+  final cartProvider = CartProvider();
+  await Future.wait([
+    authProvider.checkExistingSession(),
+    cartProvider.loadCart(),
+  ]);
+
+  runApp(VeloraApp(
+    authProvider: authProvider,
+    cartProvider: cartProvider,
+  ));
 }
 
 class VeloraApp extends StatelessWidget {
-  const VeloraApp({super.key});
+  final AuthProvider authProvider;
+  final CartProvider cartProvider;
+
+  const VeloraApp({
+    super.key,
+    required this.authProvider,
+    required this.cartProvider,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()..checkExistingSession()),
+        ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider.value(value: cartProvider),
       ],
       child: MaterialApp(
         title: 'Velora',
@@ -38,7 +57,8 @@ class RootScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLoggedIn = context.select<AuthProvider, bool>((auth) => auth.isLoggedIn);
+    final isLoggedIn =
+        context.select<AuthProvider, bool>((auth) => auth.isLoggedIn);
     if (isLoggedIn) {
       return const HomeScreen();
     }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../models/product.dart';
+import '../providers/cart_provider.dart';
 import '../widgets/app_top_icon_button.dart';
 import '../widgets/size_selector_pill.dart';
 import 'cart_screen.dart';
@@ -366,8 +368,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: SizedBox(
                       height: 50,
                       child: ElevatedButton.icon(
-                        // TODO: replace with context.read<CartProvider>().addItem(widget.product) once CartProvider exists (see cart commit)
+                        // Replaces the TODO placeholder SnackBar from the previous commit.
                         onPressed: () {
+                          context.read<CartProvider>().addItem(widget.product);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Added to cart'),

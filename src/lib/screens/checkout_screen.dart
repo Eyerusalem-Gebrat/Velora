@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../models/cart_item.dart';
+import '../providers/cart_provider.dart';
 import '../widgets/app_top_icon_button.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -31,17 +33,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  double get _subtotal {
-    if (widget.cartItems != null && widget.cartItems!.isNotEmpty) {
-      double sum = 0.0;
-      for (var item in widget.cartItems!) {
-        sum += item.price * item.quantity;
-      }
-      return sum;
-    }
-    return _basePrice * _itemQuantity;
-  }
-
+  double get _subtotal => context.read<CartProvider>().totalPrice;
   double get _total => (_subtotal + _shippingFee - _discount).clamp(0, 999999);
 
   Widget _buildInputField({
