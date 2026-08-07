@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../models/product.dart';
+import '../providers/product_provider.dart';
 import '../widgets/app_search_bar.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../widgets/app_top_icon_button.dart';
 import '../widgets/product_card.dart';
 import '../widgets/filter_pill.dart';
+import '../widgets/loading_widget.dart';
+import '../widgets/error_state_widget.dart';
+import '../widgets/empty_state_widget.dart';
 import 'home_screen.dart';
 import 'product_detail_screen.dart';
 import 'cart_screen.dart';
 import 'profile_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
-  final String categoryName;
+  final String? categoryName;
 
   const ProductListScreen({
     super.key,
-    this.categoryName = 'Dresses',
+    this.categoryName,
   });
 
   @override
@@ -24,48 +29,21 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  int _selectedFilterIndex = 0;
   int _navIndex = 1;
+  late final TextEditingController _searchController;
 
-  final List<String> _filters = const ['All', 'Dresses', 'Tops', 'Shoes'];
+  @override
+  void initState() {
+    super.initState();
+    final query = context.read<ProductProvider>().searchQuery;
+    _searchController = TextEditingController(text: query);
+  }
 
-  final List<Product> _products = const [
-    Product(
-      id: 1,
-      title: 'Knitted Sweater',
-      price: 49.00,
-      description: 'Cozy knitted sweater',
-      category: "women's clothing",
-      image: 'https://picsum.photos/seed/201/300/400',
-      badge: 'New in',
-    ),
-    Product(
-      id: 2,
-      title: 'Oversized Blazer',
-      price: 89.00,
-      description: 'Classic oversized blazer',
-      category: "women's clothing",
-      image: 'https://picsum.photos/seed/202/300/400',
-      badge: 'Best Seller',
-    ),
-    Product(
-      id: 3,
-      title: 'Slip Midi Dress',
-      price: 65.00,
-      description: 'Elegant slip midi dress',
-      category: "women's clothing",
-      image: 'https://picsum.photos/seed/203/300/400',
-      badge: 'New in',
-    ),
-    Product(
-      id: 4,
-      title: 'Relaxed Shirt',
-      price: 39.00,
-      description: 'Casual relaxed shirt',
-      category: "women's clothing",
-      image: 'https://picsum.photos/seed/204/300/400',
-    ),
-  ];
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _navigateToProductDetail(Product product) {
     Navigator.push(
@@ -97,8 +75,75 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
   }
 
+  String _formatCategoryTitle(String? selectedCategory) {
+    if (selectedCategory == null ||
+        selectedCategory.isEmpty ||
+        selectedCategory == 'All') {
+      return 'All Products';
+    }
+    final words = selectedCategory.split(' ');
+    return words.map((word) {
+      if (word.isEmpty) return word;
+      return '${word[0].toUpperCase()}${word.substring(1)}';
+    }).join(' ');
+  }
+
+  Widget _buildProductGrid(ProductProvider productProvider) {
+    if (productProvider.isLoading && productProvider.allProducts.isEmpty) {
+      return const LoadingWidget();
+    }
+
+    if (productProvider.errorMessage != null &&
+        productProvider.allProducts.isEmpty) {
+      return ErrorStateWidget(
+        message: productProvider.errorMessage!,
+        onRetry: () {
+          context.read<ProductProvider>().fetchProducts();
+          context.read<ProductProvider>().fetchCategories();
+        },
+      );
+    }
+
+    final filteredProducts = productProvider.filteredProducts;
+
+    if (filteredProducts.isEmpty) {
+      return const EmptyStateWidget(
+        message: 'No products found',
+      );
+    }
+
+    final crossAxisCount = MediaQuery.of(context).size.width > 600 ? 3 : 2;
+
+    return GridView.builder(
+      padding: const EdgeInsets.only(
+        left: 20,
+        right: 20,
+        bottom: 90,
+      ),
+      itemCount: filteredProducts.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: 0.72,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+      ),
+      itemBuilder: (context, index) {
+        final product = filteredProducts[index];
+        return ProductCard(
+          product: product,
+          onTap: () => _navigateToProductDetail(product),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final productProvider = context.watch<ProductProvider>();
+    final selectedCategory = productProvider.selectedCategory;
+    final titleText = _formatCategoryTitle(selectedCategory);
+    final filterPills = ['All', ...productProvider.categories];
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -129,7 +174,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          widget.categoryName,
+                          titleText,
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -139,7 +184,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       ),
                       AppTopIconButton(
                         icon: Icons.shopping_bag_outlined,
-                        badgeCount: 2,
+                        // TODO: wire to CartProvider.itemCount in the cart commit
+                        badgeCount: 0,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -158,6 +204,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: AppSearchBar(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      context.read<ProductProvider>().setSearchQuery(value);
+                    },
                     onFilterTap: () {},
                   ),
                 ),
@@ -170,15 +220,29 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _filters.length,
+                    itemCount: filterPills.length,
                     itemBuilder: (context, index) {
+                      final cat = filterPills[index];
+                      final isSelected = (cat == 'All')
+                          ? (selectedCategory == null || selectedCategory == 'All')
+                          : (selectedCategory == cat);
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: FilterPill(
-                          label: _filters[index],
-                          isSelected: _selectedFilterIndex == index,
-                          onTap: () =>
-                              setState(() => _selectedFilterIndex = index),
+                          label: _formatCategoryTitle(cat),
+                          isSelected: isSelected,
+                          onTap: () {
+                            if (cat == 'All') {
+                              context
+                                  .read<ProductProvider>()
+                                  .setSelectedCategory(null);
+                            } else {
+                              context
+                                  .read<ProductProvider>()
+                                  .setSelectedCategory(cat);
+                            }
+                          },
                         ),
                       );
                     },
@@ -187,30 +251,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
                 const SizedBox(height: 16),
 
-                // 4. Scrollable GridView of products
+                // 4. Scrollable GridView / State handling
                 Expanded(
-                  child: GridView.builder(
-                    padding: const EdgeInsets.only(
-                      left: 20,
-                      right: 20,
-                      bottom: 90,
-                    ),
-                    itemCount: _products.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.72,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
-                    ),
-                    itemBuilder: (context, index) {
-                      final product = _products[index];
-                      return ProductCard(
-                        product: product,
-                        onTap: () => _navigateToProductDetail(product),
-                      );
-                    },
-                  ),
+                  child: _buildProductGrid(productProvider),
                 ),
               ],
             ),
