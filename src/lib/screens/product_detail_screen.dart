@@ -37,7 +37,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final imageHeight = mediaQuery.size.height * 0.52;
+    final imageHeight = mediaQuery.size.height * 0.48;
     final formattedCategory = _formatCategory(widget.product.category);
 
     return Scaffold(
@@ -96,33 +96,38 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         top: mediaQuery.padding.top + 8,
                         left: 20,
                         right: 20,
-                        child: Row(
-                          children: [
-                            AppTopIconButton(
-                              icon: Icons.arrow_back_rounded,
-                              onTap: () => Navigator.pop(context),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 600),
+                            child: Row(
+                              children: [
+                                AppTopIconButton(
+                                  icon: Icons.arrow_back_rounded,
+                                  onTap: () => Navigator.pop(context),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'Product Details',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const Spacer(),
+                                AppTopIconButton(
+                                  icon: Icons.shopping_bag_outlined,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => const CartScreen()),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Product Details',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const Spacer(),
-                            AppTopIconButton(
-                              icon: Icons.shopping_bag_outlined,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const CartScreen()),
-                                );
-                              },
-                            ),
-                          ],
+                          ),
                         ),
                       ),
 
@@ -168,147 +173,165 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 // Details Card overlapping image slightly
                 Transform.translate(
                   offset: const Offset(0, -20),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: AppColors.shadow,
-                            blurRadius: 16,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Category Label & Rating row
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                formattedCategory,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textSecondary,
-                                ),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.cardWhite,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AppColors.shadow,
+                                blurRadius: 16,
+                                offset: Offset(0, 4),
                               ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Category Label & Rating row
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Icon(
-                                    Icons.star_rounded,
-                                    size: 16,
-                                    color: Colors.amber,
+                                  Expanded(
+                                    child: Text(
+                                      formattedCategory,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 8),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star_rounded,
+                                        size: 16,
+                                        color: Colors.amber,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${widget.product.rating.toStringAsFixed(1)} (${widget.product.ratingCount} reviews)',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              // Title and Price row
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      widget.product.title,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                        height: 1.25,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
                                   Text(
-                                    '${widget.product.rating.toStringAsFixed(1)} (${widget.product.ratingCount} reviews)',
+                                    '\$${widget.product.price.toStringAsFixed(2)}',
                                     style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.price,
                                     ),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
 
-                          const SizedBox(height: 10),
+                              const SizedBox(height: 18),
 
-                          // Title and Price row
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
+                              // Size selector pills (horizontally scrollable if needed)
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: List.generate(_sizes.length, (index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: SizeSelectorPill(
+                                        size: _sizes[index],
+                                        isSelected: _selectedSizeIndex == index,
+                                        onTap: () => setState(
+                                            () => _selectedSizeIndex = index),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Description section
+                              const Text(
+                                'Description:',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                widget.product.description,
+                                maxLines: _isDescriptionExpanded ? null : 3,
+                                overflow: _isDescriptionExpanded
+                                    ? TextOverflow.visible
+                                    : TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary,
+                                  height: 1.4,
+                                  fontFamily: 'Poppins',
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isDescriptionExpanded =
+                                        !_isDescriptionExpanded;
+                                  });
+                                },
                                 child: Text(
-                                  widget.product.title,
+                                  _isDescriptionExpanded
+                                      ? 'Show Less'
+                                      : 'Read More',
                                   style: const TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.textPrimary,
-                                    height: 1.25,
+                                    decoration: TextDecoration.underline,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Text(
-                                '\$${widget.product.price.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.price,
-                                ),
-                              ),
+
+                              const SizedBox(
+                                  height: 100), // bottom space for fixed bar
                             ],
                           ),
-
-                          const SizedBox(height: 18),
-
-                          // Size selector pills
-                          Row(
-                            children: List.generate(_sizes.length, (index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: SizeSelectorPill(
-                                  size: _sizes[index],
-                                  isSelected: _selectedSizeIndex == index,
-                                  onTap: () => setState(
-                                      () => _selectedSizeIndex = index),
-                                ),
-                              );
-                            }),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Description section
-                          const Text(
-                            'Description:',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            widget.product.description,
-                            maxLines: _isDescriptionExpanded ? null : 3,
-                            overflow: _isDescriptionExpanded
-                                ? TextOverflow.visible
-                                : TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                              height: 1.4,
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isDescriptionExpanded = !_isDescriptionExpanded;
-                              });
-                            },
-                            child: Text(
-                              _isDescriptionExpanded ? 'Show Less' : 'Read More',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 80), // bottom space for fixed bar
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -322,83 +345,100 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: Container(
-              color: AppColors.background,
-              padding: const EdgeInsets.only(
-                left: 20,
-                right: 20,
-                bottom: 24,
-                top: 12,
-              ),
-              child: Row(
-                children: [
-                  // Category pill button
-                  Container(
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: AppColors.toggleInactiveBg,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.inventory_2_outlined,
-                          size: 18,
-                          color: AppColors.textPrimary,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          formattedCategory,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Container(
+                  color: AppColors.background,
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: 24,
+                    top: 12,
                   ),
-                  const SizedBox(width: 12),
-                  // Add to Bag pill button
-                  Expanded(
-                    child: SizedBox(
-                      height: 50,
-                      child: ElevatedButton.icon(
-                        // Replaces the TODO placeholder SnackBar from the previous commit.
-                        onPressed: () {
-                          context.read<CartProvider>().addItem(widget.product);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Added to cart'),
-                              duration: Duration(seconds: 2),
+                  child: Row(
+                    children: [
+                      // Category pill button
+                      Flexible(
+                        child: Container(
+                          height: 50,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardWhite,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(
+                              color: AppColors.toggleInactiveBg,
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryDark,
-                          foregroundColor: Colors.white,
-                          shape: const StadiumBorder(),
-                          elevation: 0,
-                        ),
-                        icon: const Icon(
-                          Icons.shopping_bag_outlined,
-                          size: 18,
-                        ),
-                        label: const Text(
-                          'Add to Bag',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.inventory_2_outlined,
+                                size: 18,
+                                color: AppColors.textPrimary,
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  formattedCategory,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      // Add to Bag pill button
+                      Expanded(
+                        child: SizedBox(
+                          height: 50,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              context
+                                  .read<CartProvider>()
+                                  .addItem(widget.product);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Added to cart'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryDark,
+                              foregroundColor: Colors.white,
+                              shape: const StadiumBorder(),
+                              elevation: 0,
+                            ),
+                            icon: const Icon(
+                              Icons.shopping_bag_outlined,
+                              size: 18,
+                            ),
+                            label: const FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Add to Bag',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

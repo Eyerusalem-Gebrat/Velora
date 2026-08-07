@@ -27,15 +27,18 @@ class ProfileScreen extends StatelessWidget {
             children: [
               Icon(icon, color: AppColors.textSecondary, size: 20),
               const SizedBox(width: 14),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
+              Flexible(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 12),
               Flexible(
+                flex: 2,
                 child: Text(
                   value,
                   textAlign: TextAlign.right,
@@ -87,145 +90,348 @@ class ProfileScreen extends StatelessWidget {
       body: Stack(
         children: [
           SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
-                // Title
-                const Center(
-                  child: Text(
-                    'My Profile',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Main body state management
-                Expanded(
-                  child: Builder(
-                    builder: (context) {
-                      if (authProvider.isUserLoading && currentUser == null) {
-                        return const LoadingWidget();
-                      }
-
-                      if (authProvider.userErrorMessage != null &&
-                          currentUser == null) {
-                        return ErrorStateWidget(
-                          message: authProvider.userErrorMessage!,
-                          onRetry: () {
-                            final username = authProvider.loggedInUsername ?? 'mor_2314';
-                            context
-                                .read<AuthProvider>()
-                                .fetchCurrentUser(username);
-                          },
-                        );
-                      }
-
-                      // User data loaded
-                      final name = currentUser?.fullName ?? 'User Profile';
-                      final email = currentUser?.email ?? '';
-                      final phone = currentUser?.phone ?? '';
-                      final address = currentUser?.fullAddress ?? '';
-
-                      return SingleChildScrollView(
-                        padding: const EdgeInsets.only(
-                          left: 20,
-                          right: 20,
-                          top: 8,
-                          bottom: 100,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    // Title
+                    const Center(
+                      child: Text(
+                        'My Profile',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Avatar & Name Header
-                            Row(
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Main body state management
+                    Expanded(
+                      child: Builder(
+                        builder: (context) {
+                          if (authProvider.isUserLoading && currentUser == null) {
+                            return const LoadingWidget();
+                          }
+
+                          if (authProvider.userErrorMessage != null &&
+                              currentUser == null) {
+                            return ErrorStateWidget(
+                              message: authProvider.userErrorMessage!,
+                              onRetry: () {
+                                final username =
+                                    authProvider.loggedInUsername ?? 'mor_2314';
+                                context
+                                    .read<AuthProvider>()
+                                    .fetchCurrentUser(username);
+                              },
+                            );
+                          }
+
+                          // User data loaded
+                          final name = currentUser?.fullName ?? 'User Profile';
+                          final email = currentUser?.email ?? '';
+                          final phone = currentUser?.phone ?? '';
+                          final address = currentUser?.fullAddress ?? '';
+
+                          return SingleChildScrollView(
+                            padding: const EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              top: 8,
+                              bottom: 110,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 68,
-                                  height: 68,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.bannerBg,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.person,
-                                    size: 38,
-                                    color: AppColors.primaryDark,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        name,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textPrimary,
-                                        ),
+                                // Avatar & Name Header
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 68,
+                                      height: 68,
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.bannerBg,
+                                        shape: BoxShape.circle,
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        email,
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: AppColors.textSecondary,
-                                        ),
+                                      child: const Icon(
+                                        Icons.person,
+                                        size: 38,
+                                        color: AppColors.primaryDark,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            name,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            email,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 20),
+                                  child: Divider(
+                                      color: AppColors.toggleInactiveBg),
+                                ),
+
+                                // Personal Information Section
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      'Personal Information',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.iconButtonBg,
+                                        borderRadius:
+                                            BorderRadius.circular(16),
+                                      ),
+                                      child: Row(
+                                        children: const [
+                                          Icon(
+                                            Icons.edit_outlined,
+                                            size: 14,
+                                            color: AppColors.textPrimary,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            'Edit',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                // Info Card
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardWhite,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: AppColors.shadow,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: Column(
+                                    children: [
+                                      _buildInfoRow(
+                                        icon: Icons.person_outline_rounded,
+                                        label: 'Full Name',
+                                        value: name,
+                                      ),
+                                      _buildInfoRow(
+                                        icon: Icons.mail_outline_rounded,
+                                        label: 'Email',
+                                        value: email,
+                                      ),
+                                      _buildInfoRow(
+                                        icon: Icons.phone_outlined,
+                                        label: 'Phone Number',
+                                        value: phone,
+                                      ),
+                                      _buildInfoRow(
+                                        icon: Icons.location_on_outlined,
+                                        label: 'Address',
+                                        value: address,
+                                      ),
+                                      // Decorative: Joined date does not exist in Fake Store API user model
+                                      _buildInfoRow(
+                                        icon: Icons.calendar_today_outlined,
+                                        label: 'Joined',
+                                        value: 'March 12, 2024',
+                                        showDivider: false,
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
 
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 20),
-                              child:
-                                  Divider(color: AppColors.toggleInactiveBg),
-                            ),
+                                const SizedBox(height: 24),
 
-                            // Personal Information Section
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                                // Decorative: Fake Store API has no orders endpoint, this section uses static placeholder data
                                 const Text(
-                                  'Personal Information',
+                                  'My Orders',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.textPrimary,
                                   ),
                                 ),
+                                const SizedBox(height: 12),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
+                                  width: double.infinity,
                                   decoration: BoxDecoration(
-                                    color: AppColors.iconButtonBg,
+                                    color: AppColors.cardWhite,
                                     borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Row(
-                                    children: const [
-                                      Icon(
-                                        Icons.edit_outlined,
-                                        size: 14,
-                                        color: AppColors.textPrimary,
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: AppColors.shadow,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
                                       ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'Edit',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textPrimary,
+                                    ],
+                                  ),
+                                  padding: const EdgeInsets.all(20),
+                                  child: const Center(
+                                    child: Text(
+                                      'No active orders yet',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                // Account Section
+                                const Text(
+                                  'Account',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardWhite,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: AppColors.shadow,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () async {
+                                          await context
+                                              .read<AuthProvider>()
+                                              .logout();
+                                          if (context.mounted) {
+                                            Navigator.of(context)
+                                                .pushAndRemoveUntil(
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      const LoginScreen()),
+                                              (route) => false,
+                                            );
+                                          }
+                                        },
+                                        behavior: HitTestBehavior.opaque,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 14),
+                                          child: Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.logout_rounded,
+                                                color: AppColors.textPrimary,
+                                                size: 20,
+                                              ),
+                                              SizedBox(width: 14),
+                                              Text(
+                                                'Log Out',
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppColors.textPrimary,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              Icon(
+                                                Icons.chevron_right_rounded,
+                                                color: AppColors.textSecondary,
+                                                size: 20,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      const Divider(
+                                          height: 1,
+                                          color: AppColors.toggleInactiveBg),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 14),
+                                        child: Row(
+                                          children: const [
+                                            Icon(
+                                              Icons.delete_outline_rounded,
+                                              color: AppColors.badgeRed,
+                                              size: 20,
+                                            ),
+                                            SizedBox(width: 14),
+                                            Text(
+                                              'Delete Account',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.badgeRed,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Icon(
+                                              Icons.chevron_right_rounded,
+                                              color: AppColors.textSecondary,
+                                              size: 20,
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -233,208 +439,13 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-
-                            const SizedBox(height: 12),
-
-                            // Info Card
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.cardWhite,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: AppColors.shadow,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Column(
-                                children: [
-                                  _buildInfoRow(
-                                    icon: Icons.person_outline_rounded,
-                                    label: 'Full Name',
-                                    value: name,
-                                  ),
-                                  _buildInfoRow(
-                                    icon: Icons.mail_outline_rounded,
-                                    label: 'Email',
-                                    value: email,
-                                  ),
-                                  _buildInfoRow(
-                                    icon: Icons.phone_outlined,
-                                    label: 'Phone Number',
-                                    value: phone,
-                                  ),
-                                  _buildInfoRow(
-                                    icon: Icons.location_on_outlined,
-                                    label: 'Address',
-                                    value: address,
-                                  ),
-                                  // Decorative: Joined date does not exist in Fake Store API user model
-                                  _buildInfoRow(
-                                    icon: Icons.calendar_today_outlined,
-                                    label: 'Joined',
-                                    value: 'March 12, 2024',
-                                    showDivider: false,
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            // Decorative: Fake Store API has no orders endpoint, this section uses static placeholder data
-                            const Text(
-                              'My Orders',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: AppColors.cardWhite,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: AppColors.shadow,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              padding: const EdgeInsets.all(20),
-                              child: const Center(
-                                child: Text(
-                                  'No active orders yet',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            // Account Section
-                            const Text(
-                              'Account',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.cardWhite,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: AppColors.shadow,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Column(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () async {
-                                      await context
-                                          .read<AuthProvider>()
-                                          .logout();
-                                      if (context.mounted) {
-                                        Navigator.of(context)
-                                            .pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (_) =>
-                                                  const LoginScreen()),
-                                          (route) => false,
-                                        );
-                                      }
-                                    },
-                                    behavior: HitTestBehavior.opaque,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 14),
-                                      child: Row(
-                                        children: const [
-                                          Icon(
-                                            Icons.logout_rounded,
-                                            color: AppColors.textPrimary,
-                                            size: 20,
-                                          ),
-                                          SizedBox(width: 14),
-                                          Text(
-                                            'Log Out',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.textPrimary,
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Icon(
-                                            Icons.chevron_right_rounded,
-                                            color: AppColors.textSecondary,
-                                            size: 20,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const Divider(
-                                      height: 1,
-                                      color: AppColors.toggleInactiveBg),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 14),
-                                    child: Row(
-                                      children: const [
-                                        Icon(
-                                          Icons.delete_outline_rounded,
-                                          color: AppColors.badgeRed,
-                                          size: 20,
-                                        ),
-                                        SizedBox(width: 14),
-                                        Text(
-                                          'Delete Account',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.badgeRed,
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        Icon(
-                                          Icons.chevron_right_rounded,
-                                          color: AppColors.textSecondary,
-                                          size: 20,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
 

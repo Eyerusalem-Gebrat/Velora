@@ -27,46 +27,52 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
-      height: 60,
-      decoration: BoxDecoration(
-        color: AppColors.primaryDark,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
+          height: 60,
+          decoration: BoxDecoration(
+            color: AppColors.primaryDark,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(4, (index) {
-          final isSelected = currentIndex == index;
-          return GestureDetector(
-            onTap: () => onTap(index),
-            behavior: HitTestBehavior.opaque,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? Colors.white.withOpacity(0.25)
-                    : Colors.transparent,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isSelected ? _selectedIcons[index] : _unselectedIcons[index],
-                color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
-                size: 22,
-              ),
-            ),
-          );
-        }),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(4, (index) {
+              final isSelected = currentIndex == index;
+              return GestureDetector(
+                onTap: () => onTap(index),
+                behavior: HitTestBehavior.opaque,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.white.withOpacity(0.25)
+                        : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isSelected ? _selectedIcons[index] : _unselectedIcons[index],
+                    color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
+                    size: 22,
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
       ),
     );
   }

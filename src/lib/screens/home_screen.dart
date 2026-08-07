@@ -115,162 +115,171 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final trendingProducts = productProvider.allProducts.take(6).toList();
     final selectedCat = productProvider.selectedCategory;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final crossAxisCount = isTablet ? 3 : 2;
+    final childAspectRatio = isTablet ? 0.76 : 0.72;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 100),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 12),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 800),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 110),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
 
-          // 1. Top row: "Velora" wordmark on left, bag button on right
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Velora',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -1.0,
-                    color: AppColors.textPrimary,
-                    fontFamily: 'Poppins',
+              // 1. Top row: "Velora" wordmark on left, bag button on right
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Velora',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -1.0,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    AppTopIconButton(
+                      icon: Icons.shopping_bag_outlined,
+                      badgeCount: context.watch<CartProvider>().itemCount,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const CartScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // 2. Search bar -> tapping navigates to search page
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: GestureDetector(
+                  onTap: () => _navigateToProductList(),
+                  child: const AbsorbPointer(
+                    child: AppSearchBar(),
                   ),
                 ),
-                AppTopIconButton(
-                  icon: Icons.shopping_bag_outlined,
-                  badgeCount: context.watch<CartProvider>().itemCount,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CartScreen()),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 3. Category section header & horizontal list from API categories
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Category',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => _navigateToProductList(),
+                      child: const Text(
+                        'See all',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 86,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: productProvider.categories.length,
+                  itemBuilder: (context, index) {
+                    final category = productProvider.categories[index];
+                    final isSelected = selectedCat == category;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: CategoryIconItem(
+                        icon: _getCategoryIcon(category),
+                        label: _formatCategoryLabel(category),
+                        isSelected: isSelected,
+                        onTap: () => _navigateToProductList(category),
+                      ),
                     );
                   },
                 ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // 2. Search bar -> tapping navigates to search page
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: GestureDetector(
-              onTap: () => _navigateToProductList(),
-              child: const AbsorbPointer(
-                child: AppSearchBar(),
               ),
-            ),
-          ),
 
-          const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-          // 3. Category section header & horizontal list from API categories
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Category',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => _navigateToProductList(),
-                  child: const Text(
-                    'See all',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
+              // 4. Trending Now header & responsive GridView
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Trending Now',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 86,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: productProvider.categories.length,
-              itemBuilder: (context, index) {
-                final category = productProvider.categories[index];
-                final isSelected = selectedCat == category;
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: CategoryIconItem(
-                    icon: _getCategoryIcon(category),
-                    label: _formatCategoryLabel(category),
-                    isSelected: isSelected,
-                    onTap: () => _navigateToProductList(category),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // 4. Trending Now header & 2-column GridView
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Trending Now',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => _navigateToProductList(),
-                  child: const Text(
-                    'See all',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
+                    GestureDetector(
+                      onTap: () => _navigateToProductList(),
+                      child: const Text(
+                        'See all',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: trendingProducts.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.72,
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
               ),
-              itemBuilder: (context, index) {
-                final product = trendingProducts[index];
-                return ProductCard(
-                  product: product,
-                  onTap: () => _navigateToProductDetail(product),
-                );
-              },
-            ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: trendingProducts.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: childAspectRatio,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
+                  ),
+                  itemBuilder: (context, index) {
+                    final product = trendingProducts[index];
+                    return ProductCard(
+                      product: product,
+                      onTap: () => _navigateToProductDetail(product),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

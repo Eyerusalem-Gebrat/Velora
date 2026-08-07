@@ -78,10 +78,14 @@ class ProductCard extends StatelessWidget {
                     Positioned(
                       top: 8,
                       left: 8,
-                      child: StatusBadge(
-                        text: product.badge!,
-                        backgroundColor: AppColors.cardWhite,
-                        textColor: AppColors.primaryDark,
+                      right: 8,
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: StatusBadge(
+                          text: product.badge!,
+                          backgroundColor: AppColors.cardWhite,
+                          textColor: AppColors.primaryDark,
+                        ),
                       ),
                     ),
                 ],
@@ -108,6 +112,8 @@ class ProductCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Text(
                 '\$${product.price.toStringAsFixed(2)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
