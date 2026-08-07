@@ -6,11 +6,11 @@ import '../widgets/size_selector_pill.dart';
 import 'cart_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final Product? product;
+  final Product product;
 
   const ProductDetailScreen({
     super.key,
-    this.product,
+    required this.product,
   });
 
   @override
@@ -19,18 +19,24 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _selectedSizeIndex = 2; // 'M' is selected by default
+  bool _isDescriptionExpanded = false;
 
   final List<String> _sizes = const ['XS', 'S', 'M', 'L', 'XL'];
 
+  String _formatCategory(String category) {
+    if (category.isEmpty) return category;
+    final words = category.split(' ');
+    return words.map((word) {
+      if (word.isEmpty) return word;
+      return '${word[0].toUpperCase()}${word.substring(1)}';
+    }).join(' ');
+  }
+
   @override
   Widget build(BuildContext context) {
-    final displayTitle = widget.product?.title ?? 'Oversized Knitted Dress';
-    final displayPrice = widget.product?.price ?? 700.00;
-    const double originalPrice = 950.00;
-    final imageUrl = widget.product?.imageUrl ?? 'https://picsum.photos/seed/detail/400/600';
-
     final mediaQuery = MediaQuery.of(context);
     final imageHeight = mediaQuery.size.height * 0.52;
+    final formattedCategory = _formatCategory(widget.product.category);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -40,7 +46,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           SingleChildScrollView(
             child: Column(
               children: [
-                // Product Image Container with Floating Actions & Dots
+                // Product Image Container with Floating Actions & Indicators
                 SizedBox(
                   height: imageHeight,
                   width: double.infinity,
@@ -54,10 +60,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             bottomRight: Radius.circular(32),
                           ),
                           child: Image.network(
-                            imageUrl,
+                            widget.product.image,
                             fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: AppColors.iconButtonBg,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.primaryDark,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              );
+                            },
                             errorBuilder: (context, error, stackTrace) =>
-                                Container(color: AppColors.iconButtonBg),
+                                Container(
+                              color: AppColors.iconButtonBg,
+                              child: const Center(
+                                child: Icon(
+                                  Icons.broken_image_outlined,
+                                  color: AppColors.textSecondary,
+                                  size: 48,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -129,15 +156,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.8),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -166,28 +184,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // New Season & Rating row
+                          // Category Label & Rating row
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'New Season',
-                                style: TextStyle(
+                              Text(
+                                formattedCategory,
+                                style: const TextStyle(
                                   fontSize: 12,
+                                  fontWeight: FontWeight.w600,
                                   color: AppColors.textSecondary,
                                 ),
                               ),
                               Row(
-                                children: const [
-                                  Icon(
-                                    Icons.star_border_rounded,
+                                children: [
+                                  const Icon(
+                                    Icons.star_rounded,
                                     size: 16,
                                     color: Colors.amber,
                                   ),
-                                  SizedBox(width: 4),
+                                  const SizedBox(width: 4),
                                   Text(
-                                    '4.8 (120 reviews)',
-                                    style: TextStyle(
+                                    '${widget.product.rating.toStringAsFixed(1)} (${widget.product.ratingCount} reviews)',
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textSecondary,
                                     ),
@@ -205,37 +224,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  displayTitle,
+                                  widget.product.title,
                                   style: const TextStyle(
-                                    fontSize: 22,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.textPrimary,
-                                    height: 1.2,
+                                    height: 1.25,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    '\$${originalPrice.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: AppColors.textSecondary,
-                                      decoration: TextDecoration.lineThrough,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '\$${displayPrice.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.price,
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                '\$${widget.product.price.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.price,
+                                ),
                               ),
                             ],
                           ),
@@ -269,28 +274,34 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          RichText(
-                            text: const TextSpan(
-                              style: TextStyle(
+                          Text(
+                            widget.product.description,
+                            maxLines: _isDescriptionExpanded ? null : 3,
+                            overflow: _isDescriptionExpanded
+                                ? TextOverflow.visible
+                                : TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                              height: 1.4,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isDescriptionExpanded = !_isDescriptionExpanded;
+                              });
+                            },
+                            child: Text(
+                              _isDescriptionExpanded ? 'Show Less' : 'Read More',
+                              style: const TextStyle(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
-                                height: 1.4,
-                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                                decoration: TextDecoration.underline,
                               ),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "Check out this comfy oversized knitted dress from Porsche's racing heritage! It's made with care, has some cool functional details, and a sleek look—perfect for anyone who loves style and performance ",
-                                ),
-                                TextSpan(
-                                  text: 'Read More',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
 
@@ -319,10 +330,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               child: Row(
                 children: [
-                  // Women category pill button
+                  // Category pill button
                   Container(
                     height: 50,
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: AppColors.cardWhite,
                       borderRadius: BorderRadius.circular(25),
@@ -331,16 +342,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                     child: Row(
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.inventory_2_outlined,
                           size: 18,
                           color: AppColors.textPrimary,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
-                          'Women',
-                          style: TextStyle(
+                          formattedCategory,
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
@@ -355,11 +366,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: SizedBox(
                       height: 50,
                       child: ElevatedButton.icon(
+                        // TODO: replace with context.read<CartProvider>().addItem(widget.product) once CartProvider exists (see cart commit)
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const CartScreen()),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Added to cart'),
+                              duration: Duration(seconds: 2),
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
