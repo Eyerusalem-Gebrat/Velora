@@ -1,1 +1,5 @@
-// product_provider.dart
+import 'package:flutter/material.dart';
+
+class ProductProvider extends ChangeNotifier {
+  // Placeholder for ProductProvider
+}
