@@ -32,23 +32,6 @@ class LoginScreen extends StatelessWidget {
                 alignment: Alignment.center,
                 width: double.infinity,
                 height: double.infinity,
-                errorBuilder: (context, error, stackTrace) => Image.asset(
-                  'lib/images/image.png',
-                  fit: BoxFit.cover,
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: const Color(0xFF111111),
-                    child: const Center(
-                      child: Icon(
-                        Icons.checkroom_outlined,
-                        size: 64,
-                        color: Colors.white24,
-                      ),
-                    ),
-                  ),
-                ),
               ),
             ),
           ),
