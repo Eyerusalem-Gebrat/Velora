@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    // Delays fetch until after the first frame.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductProvider>().fetchProducts();
       context.read<ProductProvider>().fetchCategories();
@@ -205,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 24),
 
-          // 3. Products header "All Products" (no "See all") & responsive GridView
+          // 3. Products header "All Products" & responsive GridView
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(

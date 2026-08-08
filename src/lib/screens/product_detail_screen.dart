@@ -117,200 +117,164 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ],
                         ),
                       ),
-
-                      // Vertical indicator dots on right edge
-                      Positioned(
-                        right: 16,
-                        top: imageHeight * 0.45,
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 6,
-                              height: 18,
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryDark,
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.8),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.8),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),
 
-                // Details Card overlapping image slightly
+                // Details Card overlapping image slightly, stretched to fill
+                // remaining screen height so it always reaches the bottom bar
                 Transform.translate(
                   offset: const Offset(0, -20),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.cardWhite,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: AppColors.shadow,
-                                blurRadius: 16,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Category Label & Rating row
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      formattedCategory,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.star_rounded,
-                                        size: 16,
-                                        color: Colors.amber,
-                                      ),
-                                      const SizedBox(width: 4),
-                                    ],
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              // Title and Price row
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      widget.product.title,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                        height: 1.25,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    formatPrice(widget.product.price),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.price,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 18),
-
-                              // Size selector pills (horizontally scrollable if needed)
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: List.generate(_sizes.length, (index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: SizeSelectorPill(
-                                        size: _sizes[index],
-                                        isSelected: _selectedSizeIndex == index,
-                                        onTap: () => setState(
-                                            () => _selectedSizeIndex = index),
-                                      ),
-                                    );
-                                  }),
-                                ),
-                              ),
-
-                              const SizedBox(height: 20),
-
-                              // Description section
-                              const Text(
-                                'Description:',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                widget.product.description,
-                                maxLines: _isDescriptionExpanded ? null : 3,
-                                overflow: _isDescriptionExpanded
-                                    ? TextOverflow.visible
-                                    : TextOverflow.ellipsis,
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minHeight: mediaQuery.size.height - imageHeight + 20,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: AppColors.cardWhite,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadow,
+                          blurRadius: 16,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Category Label & Rating row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                formattedCategory,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 12,
+                                  fontWeight: FontWeight.w600,
                                   color: AppColors.textSecondary,
-                                  height: 1.4,
-                                  fontFamily: 'Poppins',
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isDescriptionExpanded =
-                                        !_isDescriptionExpanded;
-                                  });
-                                },
-                                child: Text(
-                                  _isDescriptionExpanded
-                                      ? 'Show Less'
-                                      : 'Read More',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                    decoration: TextDecoration.underline,
-                                  ),
+                            ),
+                            const SizedBox(width: 8),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.star_rounded,
+                                  size: 16,
+                                  color: Colors.amber,
                                 ),
-                              ),
+                                const SizedBox(width: 4),
+                              ],
+                            ),
+                          ],
+                        ),
 
-                              const SizedBox(
-                                  height: 100), // bottom space for fixed bar
-                            ],
+                        const SizedBox(height: 10),
+
+                        // Title and Price row
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.product.title,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                  height: 1.25,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              formatPrice(widget.product.price),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.price,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        // Size selector pills (horizontally scrollable if needed)
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: List.generate(_sizes.length, (index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: SizeSelectorPill(
+                                  size: _sizes[index],
+                                  isSelected: _selectedSizeIndex == index,
+                                  onTap: () =>
+                                      setState(() => _selectedSizeIndex = index),
+                                ),
+                              );
+                            }),
                           ),
                         ),
-                      ),
+
+                        const SizedBox(height: 20),
+
+                        // Description section
+                        const Text(
+                          'Description:',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          widget.product.description,
+                          maxLines: _isDescriptionExpanded ? null : 3,
+                          overflow: _isDescriptionExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            height: 1.4,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isDescriptionExpanded = !_isDescriptionExpanded;
+                            });
+                          },
+                          child: Text(
+                            _isDescriptionExpanded ? 'Show Less' : 'Read More',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(
+                            height: 24), // bottom space for fixed bar
+                      ],
                     ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -378,9 +342,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           height: 50,
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              context
-                                  .read<CartProvider>()
-                                  .addItem(widget.product);
+                              context.read<CartProvider>().addItem(widget.product);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Added to cart'),
