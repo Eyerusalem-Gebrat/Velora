@@ -33,6 +33,7 @@ class AuthProvider extends ChangeNotifier {
   String? get userErrorMessage => _userErrorMessage;
   String? get loggedInUsername => _loggedInUsername;
 
+// At start it checks for saved token and user id in storage and fetches the user data if available
   Future<void> checkExistingSession() async {
     final token = await StorageService.getToken();
     _isLoggedIn = token != null && token.isNotEmpty;
@@ -54,6 +55,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+// Fetch user data
   Future<void> fetchCurrentUser(String username) async {
     _isUserLoading = true;
     _userErrorMessage = null;

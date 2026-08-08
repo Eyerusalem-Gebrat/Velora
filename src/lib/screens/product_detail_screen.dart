@@ -204,13 +204,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         color: Colors.amber,
                                       ),
                                       const SizedBox(width: 4),
-                                      Text(
-                                        '${widget.product.rating.toStringAsFixed(1)} (${widget.product.ratingCount} reviews)',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ],

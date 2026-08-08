@@ -57,12 +57,12 @@ class CartScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       AppTopIconButton(
                         icon: Icons.arrow_back_rounded,
                         onTap: () => _navigateToHome(context),
                       ),
+                      const SizedBox(width: 16),
                       const Text(
                         'Cart',
                         style: TextStyle(
@@ -70,10 +70,6 @@ class CartScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
-                      ),
-                      AppTopIconButton(
-                        icon: Icons.grid_view_rounded,
-                        onTap: () {},
                       ),
                     ],
                   ),
@@ -84,26 +80,9 @@ class CartScreen extends StatelessWidget {
                 // Main Content
                 Expanded(
                   child: isEmpty
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const EmptyStateWidget(
-                              icon: Icons.shopping_bag_outlined,
-                              message: 'Your cart is empty',
-                            ),
-                            const SizedBox(height: 12),
-                            ElevatedButton.icon(
-                              onPressed: () => _navigateToHome(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryDark,
-                                foregroundColor: Colors.white,
-                                shape: const StadiumBorder(),
-                              ),
-                              icon: const Icon(Icons.shopping_bag_outlined,
-                                  size: 16),
-                              label: const Text('Start Shopping'),
-                            ),
-                          ],
+                      ? const EmptyStateWidget(
+                          icon: Icons.shopping_bag_outlined,
+                          message: 'Your cart is empty',
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.only(
@@ -174,7 +153,7 @@ class CartScreen extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          'Size: ${item.size}  •  Color: ${item.color}',
+                                          'Size: ${item.size}',
                                           style: const TextStyle(
                                             fontSize: 12,
                                             color: AppColors.textSecondary,

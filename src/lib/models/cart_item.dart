@@ -4,14 +4,12 @@ class CartItem {
   final Product product;
   int quantity;
   String size;
-  String color;
   double? originalPrice;
 
   CartItem({
     required this.product,
     this.quantity = 1,
     this.size = 'M',
-    this.color = 'Grey',
     this.originalPrice,
   });
 
@@ -28,7 +26,6 @@ class CartItem {
       'product': product.toJson(),
       'quantity': quantity,
       'size': size,
-      'color': color,
       if (originalPrice != null) 'originalPrice': originalPrice,
     };
   }
@@ -38,7 +35,6 @@ class CartItem {
       product: Product.fromJson(Map<String, dynamic>.from(json['product'])),
       quantity: (json['quantity'] as num?)?.toInt() ?? 1,
       size: json['size'] as String? ?? 'M',
-      color: json['color'] as String? ?? 'Grey',
       originalPrice: (json['originalPrice'] as num?)?.toDouble(),
     );
   }

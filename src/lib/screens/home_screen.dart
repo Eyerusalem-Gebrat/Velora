@@ -75,6 +75,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Short display name for each API category string.
+  String _categoryLabel(String category) {
+    final lower = category.toLowerCase();
+    if (lower.contains('women')) return 'Women';
+    if (lower.contains('men')) return 'Men';
+    if (lower.contains('electronics')) return 'Electronics';
+    if (lower.contains('jewelery') || lower.contains('jewelry')) return 'Jewelry';
+    return formatCategory(category);
+  }
+
   IconData _getCategoryIcon(String category) {
     final lower = category.toLowerCase();
     if (lower.contains('electronics')) {
@@ -179,11 +189,15 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: productProvider.categories.map((category) {
                 final isSelected = selectedCat == category;
-                return CategoryIconItem(
-                  icon: _getCategoryIcon(category),
-                  label: formatCategory(category),
-                  isSelected: isSelected,
-                  onTap: () => _navigateToProductList(category),
+                return Expanded(
+                  child: Center(
+                    child: CategoryIconItem(
+                      icon: _getCategoryIcon(category),
+                      label: _categoryLabel(category),
+                      isSelected: isSelected,
+                      onTap: () => _navigateToProductList(category),
+                    ),
+                  ),
                 );
               }).toList(),
             ),

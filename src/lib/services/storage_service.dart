@@ -7,11 +7,13 @@ class StorageService {
   static const String _cartKey = 'cart_items';
   static const String _userIdKey = 'user_id';
 
+// To save the token in storage
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
   }
 
+// To get the saved token
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);
@@ -22,6 +24,7 @@ class StorageService {
     await prefs.remove(_tokenKey);
   }
 
+// To save to shared preferences we need to convert the list of CartItem objects to a JSON string
   static Future<void> saveCart(List<CartItem> items) async {
     final prefs = await SharedPreferences.getInstance();
     final jsonList = items.map((item) => item.toJson()).toList();
@@ -36,6 +39,7 @@ class StorageService {
       return [];
     }
 
+    // Turns the JSON string back into a list of CartItem objects
     try {
       final List decoded = jsonDecode(jsonString) as List;
       return decoded

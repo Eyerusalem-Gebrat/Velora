@@ -8,6 +8,7 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 
 Future<void> main() async {
+  // To read the storage or do async work before run app
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load persistent data before the first frame renders.
@@ -57,6 +58,7 @@ class RootScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //Rebuild again if isloggedin changed
     final isLoggedIn =
         context.select<AuthProvider, bool>((auth) => auth.isLoggedIn);
     if (isLoggedIn) {

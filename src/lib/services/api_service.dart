@@ -15,6 +15,7 @@ class ApiService {
               ),
             );
 
+// Login token
   Future<String> login(String username, String password) async {
     try {
       final response = await _dio.post(
@@ -56,6 +57,7 @@ class ApiService {
     }
   }
 
+// Gets the products under that category
   Future<List<Product>> getProductsByCategory(String category) async {
     try {
       final encodedCategory = Uri.encodeComponent(category);
@@ -71,6 +73,7 @@ class ApiService {
     }
   }
 
+// Gets the categories Electronics, Jewelery,....
   Future<List<String>> getCategories() async {
     try {
       final response = await _dio.get('/products/categories');

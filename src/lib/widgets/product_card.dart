@@ -3,7 +3,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../constants/app_colors.dart';
 import '../models/product.dart';
 import '../utils/format_helpers.dart';
-import 'status_badge.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -75,20 +74,6 @@ class ProductCard extends StatelessWidget {
                     ),
                   ),
                   // Optional badge top-left
-                  if (product.badge != null && product.badge!.isNotEmpty)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      right: 8,
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: StatusBadge(
-                          text: product.badge!,
-                          backgroundColor: AppColors.cardWhite,
-                          textColor: AppColors.primaryDark,
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
